@@ -45,16 +45,6 @@ on:
         required: false
         type: boolean
         default: true
-      WRT_FEED_HOST:
-        description: '软件源域名（Cloudflare Pages），留空则不把软件源写进固件、也不发布'
-        required: false
-        type: string
-        default: ''
-      WRT_KMOD_EXCLUDE:
-        description: '要排除的内核模块（ALL_KMODS 带进来会编译失败的），空格或换行分隔，如 kmod-ath10k-sdio'
-        required: false
-        type: string
-        default: ''
 
 env:
   GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
@@ -70,8 +60,6 @@ env:
   WRT_SOURCE: ${{inputs.WRT_SOURCE}}
   WRT_PACKAGE: ${{inputs.WRT_PACKAGE}}
   WRT_FEED_USER: ${{inputs.WRT_FEED_USER}}
-  WRT_FEED_HOST: ${{inputs.WRT_FEED_HOST}}
-  WRT_KMOD_EXCLUDE: ${{inputs.WRT_KMOD_EXCLUDE}}
 
 jobs:
   core:
@@ -221,8 +209,7 @@ jobs:
           VM=$(find ./build_dir -maxdepth 4 -name .vermagic -path '*linux-*' | head -n 1)
           [ -n "$VM" ] || { echo "ERROR: .vermagic not found"; exit 1; }
           mkdir -p "$GITHUB_WORKSPACE/vermagic"
-          #文件名用实际子目标（和 kmods/<子目标>/ 目录对应），不依赖配置文件名
-          cat "$VM" > "$GITHUB_WORKSPACE/vermagic/$WRT_SUBTARGET.txt"
+          cat "$VM" > "$GITHUB_WORKSPACE/vermagic/$WRT_CONFIG.txt"
           echo "vermagic: $(cat "$VM")"
 
       - name: Upload Vermagic
